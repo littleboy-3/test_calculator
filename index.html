@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Super Attractive Neon Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+
+    .calculator {
+      width: 320px;
+      margin: 30px auto;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #4A148C, #880E4F);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      padding: 20px;
+    }
+
+    .display {
+      font-size: 36px;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+      background-color: #000;
+      color: #00ffcc;
+      text-align: right;
+      border-radius: 10px;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
+    }
+
+    .btn {
+      font-size: 24px;
+      padding: 15px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #444;
+      color: #00ffcc;
+      box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #00ffcc;
+      color: #111;
+      transform: scale(1.1);
+    }
+
+    .btn.operator {
+      background-color: #FF9500;
+      color: #fff;
+      box-shadow: 0 0 10px rgba(255, 149, 0, 0.3);
+    }
+
+    .btn.operator:hover {
+      background-color: #FFAD33;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="animated-background"></canvas>
+  <div class="calculator">
+    <input class="display" type="text" id="result" readonly>
+    <div class="btn-grid">
+      <button class="btn" onclick="clearDisplay()">C</button>
+      <button class="btn" onclick="appendCharacter('%')">%</button>
+      <button class="btn operator" onclick="appendCharacter('/')">÷</button>
+      <button class="btn operator" onclick="appendCharacter('*')">x</button>
+      <button class="btn" onclick="appendCharacter('7')">7</button>
+      <button class="btn" onclick="appendCharacter('8')">8</button>
+      <button class="btn" onclick="appendCharacter('9')">9</button>
+      <button class="btn operator" onclick="appendCharacter('-')">-</button>
+      <button class="btn" onclick="appendCharacter('4')">4</button>
+      <button class="btn" onclick="appendCharacter('5')">5</button>
+      <button class="btn" onclick="appendCharacter('6')">6</button>
+      <button class="btn operator" onclick="appendCharacter('+')">+</button>
+      <button class="btn" onclick="appendCharacter('1')">1</button>
+      <button class="btn" onclick="appendCharacter('2')">2</button>
+      <button class="btn" onclick="appendCharacter('3')">3</button>
+      <button class="btn operator" onclick="calculate()">=</button>
+      <button class="btn" onclick="appendCharacter('0')">0</button>
+      <button class="btn" onclick="appendCharacter('.')">.</button>
+    </div>
+  </div>
+
+  <script>
+    function clearDisplay() {
+      document.getElementById("result").value = '';
+    }
+
+    function appendCharacter(character) {
+      document.getElementById("result").value += character;
+    }
+
+    function calculate() {
+      let expression = document.getElementById("result").value;
+      try {
+        let result = eval(expression);
+        document.getElementById("result").value = result;
+      } catch (error) {
+        document.getElementById("result").value = 'Error';
+      }
+    }
+  </script>
+
+  <script>
+    // Animated Background
+    const canvas = document.getElementById('animated-background');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#FF6B6B', '#FFE66D', '#3BB273', '#4ECDC4', '#6B6BFF'];
+    const maxRadius = 20;
+    const minRadius = 5;
+    const maxSpeed = 3;
+    const particles = [];
+
+    class Particle {
+      constructor(x, y, radius, color, dx, dy) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = color;
+        this.dx = dx;
+        this.dy = dy;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      update() {
+        this.x += this.dx;
+        this.y += this.dy;
+
+        if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+          this.dx = -this.dx;
+        }
+
+        if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+          this.dy = -this.dy;
+        }
+
+        this.draw();
+      }
+    }
+
+    function createParticles() {
+      for (let i = 0; i < 100; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const radius = Math.random() * (maxRadius - minRadius) + minRadius;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        const dx = (Math.random() - 0.5) * maxSpeed;
+        const dy = (Math.random() - 0.5) * maxSpeed;
+
+        particles.push(new Particle(x, y, radius, color, dx, dy));
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let particle of particles) {
+        particle.update();
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      particles.length = 0;
+      createParticles();
+    });
+
+    createParticles();
+    animate();
+  </script>
+</body>
+</html>
